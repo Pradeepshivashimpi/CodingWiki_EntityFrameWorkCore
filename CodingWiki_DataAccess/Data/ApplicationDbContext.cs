@@ -1,5 +1,7 @@
-﻿using CodingWiki_Model.Models;
+﻿using CodingWiki_DataAccess.FluentConfig;
+using CodingWiki_Model.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +10,12 @@ using System.Threading.Tasks;
 
 namespace CodingWiki_DataAccess.Data
 {
-    internal class ApplicationDbContext:DbContext
+    public class ApplicationDbContext:DbContext
     {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
+        {
+            
+        }
         public DbSet<Book> Books { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Author> Authors { get; set; }
@@ -25,18 +31,22 @@ namespace CodingWiki_DataAccess.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlServer("server=LAPTOP-DRA4PMTO;Database=CodingWiki;TrustServerCertificate=True;Trusted_Connection=True;");
+           // options.UseSqlServer("server=LAPTOP-DRA4PMTO;Database=CodingWiki;TrustServerCertificate=True;Trusted_Connection=True;")
+             //   .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           
-
-
 
             modelBuilder.Entity<Book>().Property(u => u.Price).HasPrecision(10, 5);
 
-          
+            modelBuilder.Entity<BookAuthorMap>().HasKey(u => new { u.Author_Id, u.Book_Id });
+
+            modelBuilder.ApplyConfiguration(new FluentAuthorConfig());
+            modelBuilder.ApplyConfiguration(new FluentBookAuthorMapConfig());
+            modelBuilder.ApplyConfiguration(new FluentBookConfig());
+            modelBuilder.ApplyConfiguration(new FluentBookDetailConfig());
+            modelBuilder.ApplyConfiguration(new FluentPublisherConfig());
 
             modelBuilder.Entity<Book>().HasData(
                  new Book { BookID = 1, Title = "Spider without duty", ISBN = "123B12", Price = 10.99m, Publisher_Id=1 },

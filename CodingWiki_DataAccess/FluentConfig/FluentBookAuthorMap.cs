@@ -13,7 +13,6 @@ namespace CodingWiki_DataAccess.FluentConfig
     {
         public void Configure(EntityTypeBuilder<Fluent_BookAuthorMap> modelBuilder)
         {
-            modelBuilder.HasKey(u => new { u.Author_Id, u.Book_Id });
 
             modelBuilder.HasKey(u => new { u.Author_Id, u.Book_Id });
             modelBuilder.HasOne(u => u.Book).WithMany(u => u.BookAuthorMap)
